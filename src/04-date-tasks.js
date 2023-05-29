@@ -19,8 +19,8 @@
  *    'Tue, 26 Jan 2016 13:48:02 GMT' => Date()
  *    'Sun, 17 May 1998 03:00:00 GMT+01' => Date()
  */
-function parseDataFromRfc2822(/* value */) {
-  throw new Error('Not implemented');
+function parseDataFromRfc2822(value) {
+  return Date.parse(value);
 }
 
 /**
@@ -34,8 +34,8 @@ function parseDataFromRfc2822(/* value */) {
  *    '2016-01-19T16:07:37+00:00'    => Date()
  *    '2016-01-19T08:07:37Z' => Date()
  */
-function parseDataFromIso8601(/* value */) {
-  throw new Error('Not implemented');
+function parseDataFromIso8601(value) {
+  return Date.parse(value);
 }
 
 
@@ -53,8 +53,9 @@ function parseDataFromIso8601(/* value */) {
  *    Date(2012,1,1)    => true
  *    Date(2015,1,1)    => false
  */
-function isLeapYear(/* date */) {
-  throw new Error('Not implemented');
+function isLeapYear(date) {
+  date.setMonth(1, 29);
+  return date.getMonth() === 1;
 }
 
 
@@ -73,8 +74,14 @@ function isLeapYear(/* date */) {
  *    Date(2000,1,1,10,0,0),  Date(2000,1,1,10,0,0,250)     => "00:00:00.250"
  *    Date(2000,1,1,10,0,0),  Date(2000,1,1,15,20,10,453)   => "05:20:10.453"
  */
-function timeSpanToString(/* startDate, endDate */) {
-  throw new Error('Not implemented');
+function timeSpanToString(startDate, endDate) {
+  const timeSpan = endDate - startDate;
+  const hours = String(Math.floor(timeSpan / 3600000)).padStart(2, '0');
+  const minutes = String(Math.floor((timeSpan % 3600000) / 60000)).padStart(2, '0');
+  const seconds = String(Math.floor((timeSpan % 3600000 % 60000) / 1000)).padStart(2, '0');
+  const milliseconds = String(timeSpan % 3600000 % 60000 % 1000).padStart(3, '0');
+  return `${hours}:${minutes}:${seconds}.${milliseconds}`;
+  // return new Date(timeSpan).toISOString().split('T')[1].slice(0, -1);
 }
 
 
@@ -94,8 +101,14 @@ function timeSpanToString(/* startDate, endDate */) {
  *    Date.UTC(2016,3,5,18, 0) => Math.PI
  *    Date.UTC(2016,3,5,21, 0) => Math.PI/2
  */
-function angleBetweenClockHands(/* date */) {
-  throw new Error('Not implemented');
+function angleBetweenClockHands(date) {
+  const minutes = date.getMinutes();
+  const hours = date.getUTCHours() >= 12 ? date.getUTCHours() % 12 : date.getUTCHours();
+  const degMinutes = (minutes * 360) / 60;
+  const degHours = ((hours + minutes / 60) * 360) / 12;
+  return Math.abs(degHours - degMinutes) > 180
+    ? (Math.PI * (360 - Math.abs(degHours - degMinutes))) / 180
+    : (Math.PI * Math.abs(degHours - degMinutes)) / 180;
 }
 
 
